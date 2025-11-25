@@ -18,7 +18,16 @@ async function dnsLookup(urlString) {
 
         const data = await res.json();
 
+        let ips = [];
+        let ttl = 0;
+
+        if (data.Answer && Array.isArray(data.Answer)) {
+            ips = data.Answer.map(record => record.data);
+            ttl = data.Answer[0].TTL;
+        }
         console.log(data);
+        return { status: 'success', ips, ttl };
+
     }catch (err){
         return { status: 'error', message: err.message };
     }

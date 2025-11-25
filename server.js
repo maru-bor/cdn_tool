@@ -3,6 +3,8 @@ import fetch from 'node-fetch';
 
 const app = express();
 
+app.use(express.static('client'));
+
 async function dnsLookup(urlString) {
     try {
         const url = new URL(urlString);

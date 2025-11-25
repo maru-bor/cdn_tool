@@ -22,3 +22,13 @@ async function dnsLookup(urlString) {
     }
 
 }
+
+app.get('/api/test', async (req, res) => {
+    const { url } = req.query;
+    const dnsResult = await dnsLookup(url);
+
+
+    res.json({ url, modules: { dns: dnsResult } });
+})
+
+app.listen(3000, () => console.log(`Server listening on http://localhost:3000`))

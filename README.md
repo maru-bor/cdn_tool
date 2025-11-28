@@ -5,8 +5,6 @@ A website diagnostic tool built with Node.js, Express and vanilla JavaScript. Th
  - CDN provider
  - More to be added soon..
  # Installation and Setup
- 
-
     git clone <repo URL>
     cd cdn_tool
     npm install

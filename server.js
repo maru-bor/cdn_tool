@@ -6,6 +6,27 @@ const app = express();
 app.use(express.static('client'));
 
 
+async function cdnDetect(urlString){
+    try{
+        const url = new URL(urlString);
+        const res = await fetch(url, { method: 'HEAD' });
+        const headers = Object.fromEntries(res.headers.entries());
+        const providersDetected = [];
+        const headerString = JSON.stringify(headers).toLowerCase();
+
+        if (headerString.includes('cloudflare')) providersDetected.push('Cloudflare');
+        if (headerString.includes('x-amz-cf')) providersDetected.push('Amazon CloudFront');
+        if (headerString.includes('akamai')) providersDetected.push('Akamai');
+        return {
+            status: 'success',
+            cdn: providersDetected.length > 0 ? [...providersDetected] : ['No CDN providers detected'],
+            headers
+        };
+
+    }catch (err){
+        return { status: 'error', message: err.message };
+    }
+}
 
 
 async function dnsLookup(urlString) {
@@ -37,13 +58,14 @@ async function dnsLookup(urlString) {
 
 app.get('/api/test', async (req, res) => {
     const { url } = req.query;
-    const [dnsResult, tlsResult] = await Promise.all([
+    if (!url) return res.status(400).json({ error: 'Missing URL' });
+    const [dnsResult, cdnResult] = await Promise.all([
         dnsLookup(url),
-        tlsInfo(url)
+        cdnDetect(url)
     ]);
 
 
-    res.json({ url, modules: { dns: dnsResult, tls: tlsResult } });
+    res.json({ url, modules: { dns: dnsResult, cdn: cdnResult } });
 })
 
 app.listen(3000, () => console.log(`Server listening on http://localhost:3000`))

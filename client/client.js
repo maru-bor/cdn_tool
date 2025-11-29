@@ -8,6 +8,8 @@ dnsButton.addEventListener('click', async () => {
         return;
     }
 
+    resultsDiv.innerText = 'Fetching URL info...';
+
     try{
         const res = await fetch(`/api/test?url=${encodeURIComponent(url)}`);
         const data = await res.json();
@@ -18,6 +20,14 @@ dnsButton.addEventListener('click', async () => {
         }else {
             resultsDiv.innerHTML = `Error: ${data.modules.dns.message}`;
         }
+
+        if(data.modules.cdn.status === 'success'){
+            resultsDiv.innerHTML += `<br><strong>CDN Detection:</strong><br>` +
+                `CDN Provider(s): ${data.modules.cdn.cdn.join(', ')}<br>`;
+        }else {
+            resultsDiv.innerHTML += `<br>CDN Error: ${data.modules?.cdn?.message || 'Unknown error'}`;
+        }
+
     }catch (err){
         resultsDiv.innerText = 'Request failed: ' + err.message;
     }

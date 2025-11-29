@@ -5,6 +5,9 @@ const app = express();
 
 app.use(express.static('client'));
 
+
+
+
 async function dnsLookup(urlString) {
     try {
         const url = new URL(urlString);
@@ -19,14 +22,12 @@ async function dnsLookup(urlString) {
         const data = await res.json();
 
         let ips = [];
-        let ttl = 0;
 
         if (data.Answer && Array.isArray(data.Answer)) {
             ips = data.Answer.map(record => record.data);
-            ttl = data.Answer[0].TTL;
         }
         console.log(data);
-        return { status: 'success', ips, ttl };
+        return { status: 'success', ips};
 
     }catch (err){
         return { status: 'error', message: err.message };
@@ -36,10 +37,13 @@ async function dnsLookup(urlString) {
 
 app.get('/api/test', async (req, res) => {
     const { url } = req.query;
-    const dnsResult = await dnsLookup(url);
+    const [dnsResult, tlsResult] = await Promise.all([
+        dnsLookup(url),
+        tlsInfo(url)
+    ]);
 
 
-    res.json({ url, modules: { dns: dnsResult } });
+    res.json({ url, modules: { dns: dnsResult, tls: tlsResult } });
 })
 
 app.listen(3000, () => console.log(`Server listening on http://localhost:3000`))

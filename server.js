@@ -8,7 +8,7 @@ app.use(express.static('client'));
 async function cacheAnalysis(urlString) {
     try{
         const url = new URL(urlString);
-        const res = await fetch(url, { method: 'HEAD', redirect: 'follow' });
+        const res = await fetch(url, { method: 'HEAD'});
 
 
         const headers = {};

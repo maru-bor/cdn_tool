@@ -8,12 +8,14 @@ app.use(express.static('client'));
 async function cacheAnalysis(urlString) {
     try{
         const url = new URL(urlString);
-        const res = await fetch(url, { method: 'HEAD' });
+        const res = await fetch(url, { method: 'HEAD', redirect: 'follow' });
+
 
         const headers = {};
         res.headers.forEach((value, key) => {
             headers[key.toLowerCase()] = value;
         });
+
 
         const cacheControl = headers["cache-control"];
         const expires = headers["expires"];
@@ -62,7 +64,7 @@ async function cdnDetect(urlString){
 
         return {
             status: 'success',
-            cdn: providersDetected.length > 0 ? [...providersDetected] : ['No CDN providers detected'],
+            cdnProv: providersDetected.length > 0 ? [...providersDetected] : ['No CDN providers detected'],
             headers
         };
 
@@ -90,7 +92,6 @@ async function dnsLookup(urlString) {
         if (data.Answer && Array.isArray(data.Answer)) {
             ips = data.Answer.map(record => record.data);
         }
-        console.log(data);
         return { status: 'success', ips};
 
     }catch (err){

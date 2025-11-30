@@ -15,7 +15,7 @@ dnsButton.addEventListener('click', async () => {
         const data = await res.json();
 
         if (data.modules.dns.status === 'success') {
-            resultsDiv.innerHTML = `<strong>DNS Lookup for ${data.url}:</strong><br>` +
+            resultsDiv.innerHTML = `<strong>DNS Lookup:</strong><br>` +
                 `IP Addresses: ${data.modules.dns.ips.join(', ')}<br>`;
         }else {
             resultsDiv.innerHTML = `Error: ${data.modules.dns.message}`;

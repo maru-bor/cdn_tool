@@ -15,6 +15,33 @@ async function cacheAnalysis(urlString) {
             headers[key.toLowerCase()] = value;
         });
 
+        const cacheControl = headers["cache-control"];
+        const expires = headers["expires"];
+
+        let cacheability = "unknown";
+
+        if (!cacheControl && !expires) {
+            cacheability = "no caching headers";
+        } else if (cacheControl?.includes("no-store")) {
+            cacheability = "not cacheable (no-store)";
+        } else if (cacheControl?.includes("no-cache")) {
+            cacheability = "revalidated on every request (no-cache)";
+        } else if (cacheControl?.includes("max-age")) {
+            cacheability = "cacheable";
+        } else if (expires) {
+            cacheability = "cacheable (expires header)";
+        }
+
+        return {
+            status: 'success',
+            cacheControl,
+            expires,
+            cacheability
+        };
+
+
+
+
     } catch (err){
         return { status: 'error', message: err.message };
     }
@@ -32,6 +59,7 @@ async function cdnDetect(urlString){
         if (headerString.includes('cloudflare')) providersDetected.push('Cloudflare');
         if (headerString.includes('x-amz-cf')) providersDetected.push('Amazon CloudFront');
         if (headerString.includes('akamai')) providersDetected.push('Akamai');
+
         return {
             status: 'success',
             cdn: providersDetected.length > 0 ? [...providersDetected] : ['No CDN providers detected'],
@@ -74,12 +102,20 @@ async function dnsLookup(urlString) {
 app.get('/api/test', async (req, res) => {
     const { url } = req.query;
     if (!url) return res.status(400).json({ error: 'Missing URL' });
-    const [dnsResult, cdnResult] = await Promise.all([
+
+    const [dnsResult, cdnResult, cacheResult] = await Promise.all([
         dnsLookup(url),
-        cdnDetect(url)
+        cdnDetect(url),
+        cacheAnalysis(url)
     ]);
 
-    res.json({ url, modules: { dns: dnsResult, cdn: cdnResult } });
+    res.json({ url, modules:
+            {
+                dns: dnsResult,
+                cdn: cdnResult,
+                cache: cacheResult
+            }
+    });
 })
 
 app.listen(3000, () => console.log(`Server listening on http://localhost:3000`))

@@ -25,7 +25,14 @@ dnsButton.addEventListener('click', async () => {
             resultsDiv.innerHTML += `<br><strong>CDN Detection:</strong><br>` +
                 `CDN Provider(s): ${data.modules.cdn.cdn.join(', ')}<br>`;
         }else {
-            resultsDiv.innerHTML += `<br>CDN Error: ${data.modules?.cdn?.message || 'Unknown error'}`;
+            resultsDiv.innerHTML += `Error: ${data.modules.cdn.message}`;
+        }
+
+        if (data.modules.cache.status === 'success') {
+            resultsDiv.innerHTML = `<strong>Cache header analysis:</strong><br>` +
+                `Cache-control: ${data.modules.cache}<br>`;
+        }else {
+            resultsDiv.innerHTML = `Error: ${data.modules.cache.message}`;
         }
 
     }catch (err){

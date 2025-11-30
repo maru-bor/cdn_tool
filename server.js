@@ -24,11 +24,11 @@ async function cacheAnalysis(urlString) {
 
         if (!cacheControl && !expires) {
             cacheability = "no caching headers";
-        } else if (cacheControl?.includes("no-store")) {
+        } else if (cacheControl.includes("no-store")) {
             cacheability = "not cacheable (no-store)";
-        } else if (cacheControl?.includes("no-cache")) {
+        } else if (cacheControl.includes("no-cache")) {
             cacheability = "revalidated on every request (no-cache)";
-        } else if (cacheControl?.includes("max-age")) {
+        } else if (cacheControl.includes("max-age")) {
             cacheability = "cacheable";
         } else if (expires) {
             cacheability = "cacheable (expires header)";

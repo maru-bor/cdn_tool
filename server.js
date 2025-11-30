@@ -5,6 +5,21 @@ const app = express();
 
 app.use(express.static('client'));
 
+async function cacheAnalysis(urlString) {
+    try{
+        const url = new URL(urlString);
+        const res = await fetch(url, { method: 'HEAD' });
+
+        const headers = {};
+        res.headers.forEach((value, key) => {
+            headers[key.toLowerCase()] = value;
+        });
+
+    } catch (err){
+        return { status: 'error', message: err.message };
+    }
+}
+
 
 async function cdnDetect(urlString){
     try{
@@ -63,7 +78,6 @@ app.get('/api/test', async (req, res) => {
         dnsLookup(url),
         cdnDetect(url)
     ]);
-
 
     res.json({ url, modules: { dns: dnsResult, cdn: cdnResult } });
 })

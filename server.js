@@ -45,7 +45,7 @@ async function cacheAnalysis(urlString) {
 
 
     } catch (err){
-        return { status: 'error', message: err.message };
+        return { status: 'error', code: "CACHE_FETCH_FAILED", message: err.message };
     }
 }
 
@@ -69,7 +69,7 @@ async function cdnDetect(urlString){
         };
 
     }catch (err){
-        return { status: 'error', message: err.message };
+        return { status: 'error', code: "CDN_DETECTION_FAILED", message: err.message };
     }
 }
 
@@ -95,26 +95,45 @@ async function dnsLookup(urlString) {
         return { status: 'success', ips};
 
     }catch (err){
-        return { status: 'error', message: err.message };
+        return { status: 'error', code: "DNS_LOOKUP_FAILED", message: err.message };
     }
 
 }
 
 app.get('/api/test', async (req, res) => {
     const { url } = req.query;
-    if (!url) return res.status(400).json({ error: 'Missing URL' });
+    if (!url)  return res.status(400).json({
+        status: "error",
+        code: "MISSING_URL",
+        message: "Please provide a valid URL."
+    });
+
+    let parsedURL;
+    try {
+        parsedURL = new URL(url);
+    } catch (err) {
+        return res.status(400).json({
+            status: "error",
+            code: "INVALID_URL",
+            message: "The URL format is invalid. Example: https://example.com"
+        });
+    }
 
     const [dnsResult, cdnResult, cacheResult] = await Promise.all([
-        dnsLookup(url),
-        cdnDetect(url),
-        cacheAnalysis(url)
+        dnsLookup(parsedURL.hostname),
+        cdnDetect(parsedURL.hostname),
+        cacheAnalysis(parsedURL.href)
     ]);
 
     res.json({ url, modules:
             {
-                dns: dnsResult,
-                cdn: cdnResult,
-                cache: cacheResult
+                status: "success",
+                url: parsedURL.href,
+                modules: {
+                    dns: dnsResult,
+                    cdn: cdnResult,
+                    cache: cacheResult
+                }
             }
     });
 })

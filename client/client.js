@@ -1,5 +1,8 @@
 const dnsButton = document.getElementById('dnsButton');
 const resultsDiv = document.getElementById('results');
+const errorMsg = {
+
+}
 
 dnsButton.addEventListener('click', async () => {
     const url = document.getElementById('urlInput').value.trim();

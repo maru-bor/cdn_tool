@@ -25,7 +25,7 @@ function normalizeURL(input) {
 
 }
 
-async function tlsInfo(hostname) {
+async function tlsDetect(hostname) {
     return new Promise((resolve) => {
         const options = {
             host: hostname,
@@ -191,10 +191,11 @@ app.get('/api/test', async (req, res) => {
         });
     }
 
-    const [dnsResult, cdnResult, cacheResult] = await Promise.all([
+    const [dnsResult, cdnResult, cacheResult, tlsResult] = await Promise.all([
         dnsLookup(parsedURL.hostname),
         cdnDetect(parsedURL.href),
-        cacheAnalysis(parsedURL.href)
+        cacheAnalysis(parsedURL.href),
+        tlsDetect(parsedURL.hostname)
     ]);
 
     res.json({
@@ -203,7 +204,8 @@ app.get('/api/test', async (req, res) => {
         modules: {
             dns: dnsResult,
             cdn: cdnResult,
-            cache: cacheResult
+            cache: cacheResult,
+            tls: tlsResult
         }
     });
 })

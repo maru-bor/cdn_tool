@@ -5,6 +5,25 @@ const app = express();
 
 app.use(express.static('client'));
 
+function normalizeURL(input) {
+    let urlString = input.trim();
+
+    if (!/^https?:\/\//i.test(urlString)) {
+        urlString = "https://" + urlString;
+    }
+
+    const url = new URL(urlString);
+    url.hostname = url.hostname.toLowerCase();
+
+    if (url.pathname === "/") {
+        url.pathname = "";
+    }
+
+    return url;
+
+}
+
+
 async function cacheAnalysis(urlString) {
     try{
         const url = new URL(urlString);
@@ -74,11 +93,8 @@ async function cdnDetect(urlString){
 }
 
 
-async function dnsLookup(urlString) {
+async function dnsLookup(hostname) {
     try {
-        const url = new URL(urlString);
-        const hostname = url.hostname;
-
         const apiUrl = `https://cloudflare-dns.com/dns-query?name=${hostname}&type=A`;
 
         const res = await fetch(apiUrl, {
@@ -86,6 +102,7 @@ async function dnsLookup(urlString) {
         });
 
         const data = await res.json();
+        console.log("API RESPONSE:", data);
 
         let ips = [];
 

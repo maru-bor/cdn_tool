@@ -39,7 +39,7 @@ p {
 
 #urlInput {
     flex: 1;
-    min-width: 200px;
+    min-width: 500px;
     padding: 15px;
     font-size: 18px;
     border: 1px solid #ccc;

@@ -3,8 +3,8 @@ const resultsDiv = document.getElementById('results');
 const errorMsg = {
     MISSING_URL: "You must enter a URL.",
     INVALID_URL: "The URL format is invalid.",
-    DNS_LOOKUP_FAILED: "Couldn't resolve the domain name. The website may not exist.",
-    CACHE_FETCH_FAILED: "Unable to retrieve cache headers. The site may block HEAD requests.",
+    DNS_LOOKUP_FAILED: "Couldn't resolve the domain name.",
+    CACHE_FETCH_FAILED: "Unable to retrieve cache headers.",
     CDN_DETECTION_FAILED: "Unable to detect CDN providers.",
     TLS_CONNECTION_FAILED: "Failed to establish a secure TLS connection.",
     NO_CERTIFICATE: "The website does not provide a valid SSL certificate.",

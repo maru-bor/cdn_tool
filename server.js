@@ -26,6 +26,37 @@ function normalizeURL(input) {
 
 }
 
+async function performanceTest(urlString) {
+    try {
+        const url = new URL(urlString);
+
+        const startTime = Date.now();
+
+        // Measure TTFB
+        const ttfbStart = Date.now();
+        const res = await fetch(url.href);
+        const ttfb = Date.now() - ttfbStart;
+
+        // Measure total load time (fetching entire body)
+        await res.text();
+        const totalTime = Date.now() - startTime;
+
+        return {
+            status: "success",
+            ttfb,        // in ms
+            totalTime    // in ms
+        };
+
+    } catch (err) {
+        return {
+            status: "error",
+            code: "PERFORMANCE_TEST_FAILED",
+            message: err.message
+        };
+    }
+}
+
+
 async function httpDetect(urlString) {
     try {
         const url = new URL(urlString);

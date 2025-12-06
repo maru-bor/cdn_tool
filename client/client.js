@@ -9,6 +9,7 @@ const errorMsg = {
     TLS_CONNECTION_FAILED: "Failed to establish a secure TLS connection.",
     NO_CERTIFICATE: "The website does not provide a valid SSL certificate.",
     HTTP_PROTOCOL_DETECTION_FAILED: "Unable to detect the supported HTTP protocol.",
+    HTTP_PROTOCOL_BAD_URL: "Invalid URL format for HTTP protocol detection.",
     PERFORMANCE_TEST_FAILED: "Unable to test website performance."
 }
 

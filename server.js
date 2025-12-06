@@ -1,7 +1,6 @@
 import express from 'express';
 import fetch from 'node-fetch';
 import tls from "tls";
-import https from "https";
 
 const app = express();
 
@@ -26,6 +25,11 @@ function normalizeURL(input) {
 
 }
 
+function isValidHostname(hostname) {
+    const regex = /^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return regex.test(hostname);
+}
+
 async function performanceTest(urlString) {
     try {
         const url = new URL(urlString);
@@ -45,8 +49,7 @@ async function performanceTest(urlString) {
     } catch (err) {
         return {
             status: "error",
-            code: "PERFORMANCE_TEST_FAILED",
-            message: err.message
+            code: "PERFORMANCE_TEST_FAILED"
         };
     }
 }
@@ -79,8 +82,7 @@ async function httpDetect(urlString) {
             socket.on("error", (err) => {
                 resolve({
                     status: "error",
-                    code: "HTTP_PROTOCOL_DETECTION_FAILED",
-                    message: err.message
+                    code: "HTTP_PROTOCOL_DETECTION_FAILED"
                 });
             });
         });
@@ -88,8 +90,7 @@ async function httpDetect(urlString) {
     } catch (err) {
         return {
             status: "error",
-            code: "HTTP_PROTOCOL_BAD_URL",
-            message: err.message
+            code: "HTTP_PROTOCOL_BAD_URL"
         };
     }
 }
@@ -110,8 +111,7 @@ async function tlsDetect(hostname) {
             if (!cert || Object.keys(cert).length === 0) {
                 resolve({
                     status: "error",
-                    code: "NO_CERTIFICATE",
-                    message: "No SSL certificate presented."
+                    code: "NO_CERTIFICATE"
                 });
                 socket.end();
                 return;
@@ -139,8 +139,7 @@ async function tlsDetect(hostname) {
         socket.on("error", (err) => {
             resolve({
                 status: "error",
-                code: "TLS_CONNECTION_FAILED",
-                message: err.message
+                code: "TLS_CONNECTION_FAILED"
             });
         });
     });
@@ -186,7 +185,7 @@ async function cacheAnalysis(urlString) {
 
 
     } catch (err){
-        return { status: 'error', code: "CACHE_FETCH_FAILED", message: err.message };
+        return { status: 'error', code: "CACHE_FETCH_FAILED"};
     }
 }
 
@@ -210,7 +209,7 @@ async function cdnDetect(urlString){
         };
 
     }catch (err){
-        return { status: 'error', code: "CDN_DETECTION_FAILED", message: err.message };
+        return { status: 'error', code: "CDN_DETECTION_FAILED"};
     }
 }
 
@@ -233,7 +232,7 @@ async function dnsLookup(hostname) {
         return { status: 'success', ips};
 
     }catch (err){
-        return { status: 'error', code: "DNS_LOOKUP_FAILED", message: err.message };
+        return { status: 'error', code: "DNS_LOOKUP_FAILED"};
     }
 
 }
@@ -252,16 +251,14 @@ app.get('/api/test', async (req, res) => {
     } catch (err) {
         return res.status(400).json({
             status: "error",
-            code: "INVALID_URL",
-            message: "The URL format is invalid. Example: https://example.com"
+            code: "INVALID_URL"
         });
     }
 
-    if (!parsedURL.hostname) {
+    if (!isValidHostname(parsedURL.hostname)) {
         return res.status(400).json({
             status: "error",
-            code: "INVALID_URL",
-            message: "The URL format is invalid. Example: https://example.com"
+            code: "INVALID_URL"
         });
     }
 

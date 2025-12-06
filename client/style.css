@@ -8,16 +8,27 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     min-height: 100vh;
-    font-family: Arial, sans-serif;
-    background-color: #f5f5f5;
-    padding: 20px;
+    font-family: system-ui;
+    background-color: #F5F5F5;
+    padding-top: 10em;
 }
 
 h1 {
+    font-size: 3.5rem;
     margin-bottom: 20px;
     color: #333;
+    text-shadow: 4px 4px #D4A6FF;
+}
+
+
+p {
+    font-size: 1.2rem;
+    color: #333;
+    text-align: center;
+    margin-bottom: 30px;
+    max-width: 600px;
 }
 
 .input-container {
@@ -29,41 +40,48 @@ h1 {
 #urlInput {
     flex: 1;
     min-width: 200px;
-    padding: 10px;
-    font-size: 16px;
+    padding: 15px;
+    font-size: 18px;
     border: 1px solid #ccc;
     border-radius: 5px;
 }
 
 #dnsButton {
     padding: 10px 20px;
-    font-size: 16px;
+    font-size: 18px;
+    font-weight: bolder;
     border: none;
     border-radius: 5px;
-    background-color: #007bff;
+    background-color: #663399;
     color: white;
     cursor: pointer;
     transition: background-color 0.2s ease;
 }
 
 #dnsButton:hover {
-    background-color: #0056b3;
+    background-color: #461A6E;
 }
 
 #results {
     width: 80%;
-    max-width: 800px;
+    max-width: 1000px;
     background-color: white;
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     word-wrap: break-word;
+    font-size: 18px;
+
+}
+
+#results:empty {
+    display: none;
 }
 
 #results h3 {
     margin-top: 15px;
     margin-bottom: 5px;
-    color: #007bff;
+    color: #663399;
 }
 
 #results div[style*="color: #b30000"] {

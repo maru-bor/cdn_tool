@@ -1,9 +1,9 @@
 const dnsButton = document.getElementById('dnsButton');
 const resultsDiv = document.getElementById('results');
 const errorMsg = {
-    MISSING_URL: "You must enter a URL before continuing.",
-    INVALID_URL: "The URL format is invalid. Try something like: https://example.com",
-    DNS_LOOKUP_FAILED: "We couldn't resolve the domain name. The website may not exist.",
+    MISSING_URL: "You must enter a URL.",
+    INVALID_URL: "The URL format is invalid.",
+    DNS_LOOKUP_FAILED: "Couldn't resolve the domain name. The website may not exist.",
     CACHE_FETCH_FAILED: "Unable to retrieve cache headers. The site may block HEAD requests.",
     CDN_DETECTION_FAILED: "Unable to detect CDN providers.",
     TLS_CONNECTION_FAILED: "Failed to establish a secure TLS connection.",
@@ -77,15 +77,14 @@ dnsButton.addEventListener('click', async () => {
 
         html += renderSection("TLS/SSL Certificate", modules.tls, {
             protocol: "Protocol",
-            issuer: "Issuer",
             validFrom: "Valid From",
             validTo: "Valid To",
             daysRemaining: "Days Remaining"
         });
 
-        // html += renderSection("HTTP Protocol Detection", modules.httpProtocol, {
-        //     protocol: "Supported HTTP Protocol"
-        // });
+        html += renderSection("HTTP Protocol Detection", modules.http, {
+            protocol: "Supported HTTP Protocol"
+        });
 
         resultsDiv.innerHTML = html;
 

@@ -8,6 +8,7 @@ const app = express();
 app.use(express.static('client'));
 
 function normalizeURL(input) {
+
     let urlString = input.trim();
 
     if (!/^https?:\/\//i.test(urlString)) {
@@ -23,6 +24,47 @@ function normalizeURL(input) {
 
     return url;
 
+}
+
+async function httpDetect(urlString) {
+    try {
+        const url = new URL(urlString);
+
+        const options = {
+            host: url.hostname,
+            port: 443,
+            servername: url.hostname,
+            ALPNProtocols: ["h2", "http/1.1"]
+        };
+
+        return await new Promise((resolve) => {
+            const req = https.request(options, (res) => {
+                const protocol = res.socket.alpnProtocol || "http/1.1";
+
+                resolve({
+                    status: "success",
+                    protocol
+                });
+            });
+
+            req.on("error", (err) => {
+                resolve({
+                    status: "error",
+                    code: "HTTP_PROTOCOL_DETECTION_FAILED",
+                    message: err.message
+                });
+            });
+
+            req.end();
+        });
+
+    } catch (err) {
+        return {
+            status: "error",
+            code: "HTTP_PROTOCOL_BAD_URL",
+            message: err.message
+        };
+    }
 }
 
 async function tlsDetect(hostname) {
@@ -59,11 +101,9 @@ async function tlsDetect(hostname) {
             resolve({
                 status: "success",
                 protocol,
-                issuer: cert.issuer,
                 validFrom: cert.valid_from,
                 validTo: cert.valid_to,
                 daysRemaining,
-                subject: cert.subject
             });
 
             socket.end();
@@ -191,11 +231,17 @@ app.get('/api/test', async (req, res) => {
         });
     }
 
-    const [dnsResult, cdnResult, cacheResult, tlsResult] = await Promise.all([
+    const [
+        dnsResult,
+        cdnResult,
+        cacheResult,
+        tlsResult,
+        httpResult] = await Promise.all([
         dnsLookup(parsedURL.hostname),
         cdnDetect(parsedURL.href),
         cacheAnalysis(parsedURL.href),
-        tlsDetect(parsedURL.hostname)
+        tlsDetect(parsedURL.hostname),
+        httpDetect(parsedURL.href)
     ]);
 
     res.json({
@@ -205,7 +251,8 @@ app.get('/api/test', async (req, res) => {
             dns: dnsResult,
             cdn: cdnResult,
             cache: cacheResult,
-            tls: tlsResult
+            tls: tlsResult,
+            http: httpResult
         }
     });
 })

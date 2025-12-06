@@ -1,5 +1,7 @@
 import express from 'express';
 import fetch from 'node-fetch';
+import tls from "tls";
+import https from "https";
 
 const app = express();
 
@@ -23,6 +25,59 @@ function normalizeURL(input) {
 
 }
 
+async function tlsInfo(hostname) {
+    return new Promise((resolve) => {
+        const options = {
+            host: hostname,
+            port: 443,
+            servername: hostname,
+            rejectUnauthorized: false
+        };
+
+        const socket = tls.connect(options, () => {
+            const cert = socket.getPeerCertificate();
+            const protocol = socket.getProtocol();
+
+            if (!cert || Object.keys(cert).length === 0) {
+                resolve({
+                    status: "error",
+                    code: "NO_CERTIFICATE",
+                    message: "No SSL certificate presented."
+                });
+                socket.end();
+                return;
+            }
+
+            let daysRemaining = null;
+            if (cert.valid_to) {
+                const expiry = new Date(cert.valid_to);
+                const now = new Date();
+                const diff = Math.ceil((expiry - now) / (1000 * 60 * 60 * 24));
+                daysRemaining = diff;
+            }
+
+            resolve({
+                status: "success",
+                protocol,
+                issuer: cert.issuer,
+                validFrom: cert.valid_from,
+                validTo: cert.valid_to,
+                daysRemaining,
+                subject: cert.subject
+            });
+
+            socket.end();
+        });
+
+        socket.on("error", (err) => {
+            resolve({
+                status: "error",
+                code: "TLS_CONNECTION_FAILED",
+                message: err.message
+            });
+        });
+    });
+}
 
 async function cacheAnalysis(urlString) {
     try{
@@ -127,7 +182,7 @@ app.get('/api/test', async (req, res) => {
 
     let parsedURL;
     try {
-        parsedURL = new URL(url);
+        parsedURL = normalizeURL(url);
     } catch (err) {
         return res.status(400).json({
             status: "error",
@@ -138,20 +193,18 @@ app.get('/api/test', async (req, res) => {
 
     const [dnsResult, cdnResult, cacheResult] = await Promise.all([
         dnsLookup(parsedURL.hostname),
-        cdnDetect(parsedURL.hostname),
+        cdnDetect(parsedURL.href),
         cacheAnalysis(parsedURL.href)
     ]);
 
-    res.json({ url, modules:
-            {
-                status: "success",
-                url: parsedURL.href,
-                modules: {
-                    dns: dnsResult,
-                    cdn: cdnResult,
-                    cache: cacheResult
-                }
-            }
+    res.json({
+        status: "success",
+        url: parsedURL.href,
+        modules: {
+            dns: dnsResult,
+            cdn: cdnResult,
+            cache: cacheResult
+        }
     });
 })
 

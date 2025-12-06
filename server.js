@@ -32,19 +32,18 @@ async function performanceTest(urlString) {
 
         const startTime = Date.now();
 
-        // Measure TTFB
         const ttfbStart = Date.now();
         const res = await fetch(url.href);
         const ttfb = Date.now() - ttfbStart;
 
-        // Measure total load time (fetching entire body)
+
         await res.text();
         const totalTime = Date.now() - startTime;
 
         return {
             status: "success",
-            ttfb,        // in ms
-            totalTime    // in ms
+            ttfb,
+            totalTime
         };
 
     } catch (err) {

@@ -30,32 +30,33 @@ async function httpDetect(urlString) {
     try {
         const url = new URL(urlString);
 
-        const options = {
-            host: url.hostname,
-            port: 443,
-            servername: url.hostname,
-            ALPNProtocols: ["h2", "http/1.1"]
-        };
-
         return await new Promise((resolve) => {
-            const req = https.request(options, (res) => {
-                const protocol = res.socket.alpnProtocol || "http/1.1";
+            const socket = tls.connect(
+                {
+                    host: url.hostname,
+                    port: 443,
+                    servername: url.hostname,
+                    ALPNProtocols: ["h2", "http/1.1"]
+                },
+                () => {
+                    const protocol = socket.alpnProtocol || "unknown";
 
-                resolve({
-                    status: "success",
-                    protocol
-                });
-            });
+                    resolve({
+                        status: "success",
+                        protocol
+                    });
 
-            req.on("error", (err) => {
+                    socket.end();
+                }
+            );
+
+            socket.on("error", (err) => {
                 resolve({
                     status: "error",
                     code: "HTTP_PROTOCOL_DETECTION_FAILED",
                     message: err.message
                 });
             });
-
-            req.end();
         });
 
     } catch (err) {

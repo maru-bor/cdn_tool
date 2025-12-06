@@ -267,12 +267,14 @@ app.get('/api/test', async (req, res) => {
         cdnResult,
         cacheResult,
         tlsResult,
-        httpResult] = await Promise.all([
+        httpResult,
+        perfResult] = await Promise.all([
         dnsLookup(parsedURL.hostname),
         cdnDetect(parsedURL.href),
         cacheAnalysis(parsedURL.href),
         tlsDetect(parsedURL.hostname),
-        httpDetect(parsedURL.href)
+        httpDetect(parsedURL.href),
+        performanceTest(parsedURL.href)
     ]);
 
     res.json({
@@ -283,7 +285,8 @@ app.get('/api/test', async (req, res) => {
             cdn: cdnResult,
             cache: cacheResult,
             tls: tlsResult,
-            http: httpResult
+            http: httpResult,
+            perf: perfResult
         }
     });
 })

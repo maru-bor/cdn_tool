@@ -9,6 +9,7 @@ const errorMsg = {
     TLS_CONNECTION_FAILED: "Failed to establish a secure TLS connection.",
     NO_CERTIFICATE: "The website does not provide a valid SSL certificate.",
     HTTP_PROTOCOL_DETECTION_FAILED: "Unable to detect the supported HTTP protocol.",
+    PERFORMANCE_TEST_FAILED: "Unable to test website performance."
 }
 
 function displayError(code, rawMessage) {
@@ -84,6 +85,11 @@ dnsButton.addEventListener('click', async () => {
 
         html += renderSection("HTTP Protocol Detection", modules.http, {
             protocol: "Supported HTTP Protocol"
+        });
+
+        html += renderSection("Website Performance", modules.perf, {
+            ttfb: "Time To First Byte (ms)",
+            totalTime: "Total Load Time (ms)"
         });
 
         resultsDiv.innerHTML = html;

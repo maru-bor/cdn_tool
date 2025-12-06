@@ -37,13 +37,9 @@ async function performanceTest(urlString) {
         const ttfb = Date.now() - ttfbStart;
 
 
-        await res.text();
-        const totalTime = Date.now() - startTime;
-
         return {
             status: "success",
-            ttfb,
-            totalTime
+            ttfb
         };
 
     } catch (err) {
@@ -228,7 +224,6 @@ async function dnsLookup(hostname) {
         });
 
         const data = await res.json();
-        console.log("API RESPONSE:", data);
 
         let ips = [];
 
@@ -255,6 +250,14 @@ app.get('/api/test', async (req, res) => {
     try {
         parsedURL = normalizeURL(url);
     } catch (err) {
+        return res.status(400).json({
+            status: "error",
+            code: "INVALID_URL",
+            message: "The URL format is invalid. Example: https://example.com"
+        });
+    }
+
+    if (!parsedURL.hostname) {
         return res.status(400).json({
             status: "error",
             code: "INVALID_URL",

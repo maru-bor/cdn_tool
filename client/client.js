@@ -88,8 +88,7 @@ dnsButton.addEventListener('click', async () => {
         });
 
         html += renderSection("Website Performance", modules.perf, {
-            ttfb: "Time To First Byte (ms)",
-            totalTime: "Total Load Time (ms)"
+            ttfb: "Time To First Byte (ms)"
         });
 
         resultsDiv.innerHTML = html;

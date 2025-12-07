@@ -4,6 +4,7 @@ import { tlsDetect } from '../modules/tlsDetect.js';
 import { httpDetect } from '../modules/httpDetect.js';
 import { cacheAnalysis } from '../modules/cacheAnalysis.js';
 import { cdnDetect } from '../modules/cdnDetect.js';
+import { performanceTest} from '../modules/performanceTest.js';
 
 describe("CDN Tool Testing", () => {
 
@@ -15,7 +16,7 @@ describe("CDN Tool Testing", () => {
         expect(result.ips[0]).to.match(/\d+\.\d+\.\d+\.\d+/);
     });
 
-    it("dnsLookup throws an error code for an invalid site", async () => {
+    it("dnsLookup returns error for invalid site", async () => {
         const result = await dnsLookup("https://example.invalid");
         expect(result.status).to.equal("error");
         expect(result).to.have.property("code");
@@ -80,19 +81,26 @@ describe("CDN Tool Testing", () => {
     });
 
     it("httpDetect returns error for invalid site", async () => {
-        const result = await httpDetect("https://github.com");
+        const result = await httpDetect("https://example.invalid");
 
         expect(result.status).to.equal("error");
         expect(result).to.have.property("code");
 
     });
 
+    it("performanceTest returns TTFB for valid site", async () => {
+        const result = await performanceTest("https://github.com");
 
+        expect(result.status).to.equal("success");
+        expect(result).to.have.property("ttfb");
+    });
 
+    it("performanceTest returns error for invalid site", async () => {
+        const result = await performanceTest("https://example.invalid");
 
-
-
-
+        expect(result.status).to.equal("error");
+        expect(result).to.have.property("code");
+    });
 
 
 

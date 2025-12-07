@@ -10,6 +10,13 @@ export async function dnsLookup(hostname) {
 
         const data = await res.json();
 
+        if (data.Status !== 0 || !data.Answer) {
+            return {
+                status: "error",
+                code: "DNS_LOOKUP_FAILED",
+            };
+        }
+
         let ips = [];
 
         if (data.Answer && Array.isArray(data.Answer)) {

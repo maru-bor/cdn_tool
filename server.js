@@ -66,10 +66,10 @@ app.get('/api/test', async (req, res) => {
         tlsResult,
         httpResult,
         perfResult] = await Promise.all([
-        dnsLookup(parsedURL.hostname),
+        dnsLookup(parsedURL.href),
         cdnDetect(parsedURL.href),
         cacheAnalysis(parsedURL.href),
-        tlsDetect(parsedURL.hostname),
+        tlsDetect(parsedURL.href),
         httpDetect(parsedURL.href),
         performanceTest(parsedURL.href)
     ]);

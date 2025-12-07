@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { dnsLookup } from '../modules/dnsLookup.js';
 import { tlsDetect } from '../modules/tlsDetect.js';
+import { httpDetect } from '../modules/httpDetect.js';
 import { cacheAnalysis } from '../modules/cacheAnalysis.js';
 import { cdnDetect } from '../modules/cdnDetect.js';
 
@@ -62,13 +63,33 @@ describe("CDN Tool Testing", () => {
 
     });
 
-    it("cdnDetect returns success object for valid site", async () => {
+    it("cdnDetect returns error for invalid site", async () => {
         const result = await cdnDetect("https://example.invalid");
 
         expect(result.status).to.equal("error");
         expect(result).to.have.property("code");
 
     });
+
+    it("httpDetect returns protocol info for valid site", async () => {
+        const result = await httpDetect("https://github.com");
+
+        expect(result.status).to.equal("success");
+        expect(result).to.have.property("protocol");
+
+    });
+
+    it("httpDetect returns error for invalid site", async () => {
+        const result = await httpDetect("https://github.com");
+
+        expect(result.status).to.equal("error");
+        expect(result).to.have.property("code");
+
+    });
+
+
+
+
 
 
 

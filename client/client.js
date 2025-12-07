@@ -7,6 +7,7 @@ const errorMsg = {
     CACHE_FETCH_FAILED: "Unable to retrieve cache headers.",
     CDN_DETECTION_FAILED: "Unable to detect CDN providers.",
     TLS_CONNECTION_FAILED: "Failed to establish a secure TLS connection.",
+    TLS_BAD_URL: "Failed to parse URL.",
     NO_CERTIFICATE: "The website does not provide a valid SSL certificate.",
     HTTP_PROTOCOL_DETECTION_FAILED: "Unable to detect the supported HTTP protocol.",
     HTTP_PROTOCOL_BAD_URL: "Invalid URL format for HTTP protocol detection.",

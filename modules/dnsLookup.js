@@ -1,8 +1,10 @@
 import fetch from "node-fetch";
 
-export async function dnsLookup(hostname) {
+export async function dnsLookup(urlString) {
     try {
-        const apiUrl = `https://cloudflare-dns.com/dns-query?name=${hostname}&type=A`;
+        const url = new URL(urlString);
+
+        const apiUrl = `https://cloudflare-dns.com/dns-query?name=${url.hostname}&type=A`;
 
         const res = await fetch(apiUrl, {
             headers: { 'Accept': 'application/dns-json' }
